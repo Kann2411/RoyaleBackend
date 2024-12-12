@@ -1,46 +1,48 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-@Entity('users')
+@Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   image: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false })
   nick: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: false, unique: true })
   email: string;
 
-  @Column()
+  @Column({ type: 'boolean', default: false })
   admin: boolean;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   avatar: string;
 
-  @Column()
+  @Column({ type: 'boolean', default: false })
   banned: boolean;
 
-  @Column()
+  @Column({ type: 'boolean', default: false })
   inactive: boolean;
 
-  @Column()
+  @Column({ type: 'integer', nullable: true })
   age: number;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   description: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   favorites: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   country: string;
 
-  @Column()
-  chips: bigint;
+  @Column({ type: 'integer', nullable: false, default: 0 })
+  chips: number;
+
+  @Column({ type: 'varchar', nullable: false })
   password: string;
 
-  @Column()
+  @Column({ type: 'varchar', default: false, nullable: true })
   firstChips: boolean;
 }
