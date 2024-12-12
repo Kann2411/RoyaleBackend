@@ -27,4 +27,36 @@ export class userService {
       chips,
     );
   }
+
+  deleteUser(id: string) {
+    return this.userRespository.deleteUser(id);
+  }
+
+  putUserAdmin(id: string) {
+    return this.userRespository.putUserAdmin(id);
+  }
+
+  getUserById(id: string) {
+    return this.userRespository.getUserById(id);
+  }
+
+  banUser(id: string) {
+    return this.userRespository.banUser(id);
+  }
+
+  firstChips(id: string) {
+    return this.userRespository.firstChips(id);
+  }
+
+  getUserByEmail(email: string) {
+    return this.userRespository.getUserByEmail(email);
+  }
+
+  getUserByNick(nick: string) {
+    return this.userRespository.getUserByNick(nick);
+  }
+
+  inactiveUser(id: string) {
+    return this.userRespository.inactiveUser(id);
+  }
 }

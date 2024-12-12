@@ -45,7 +45,39 @@ export class userRespository {
     return { message: `user whith id ${id} update succesfull` };
   }
 
-  async createUser(nick, email, password, image, avatar, age, country, chips){
+  async createUser(nick, email, password, image, avatar, age, country, chips) {
     return { message: `user whith nick ${nick} create succesfull` };
+  }
+
+  async deleteUser(id: string) {
+    return { message: `user whith id ${id} delete succesfull` };
+  }
+
+  async putUserAdmin(id: string) {
+    return { messaje: `user whith id ${id} update succesfull` };
+  }
+
+  async getUserById(id: string) {
+    return { messaje: `user whith id ${id} get succesfull` };
+  }
+
+  async banUser(id: string) {
+    return { message: `user whith id ${id} ban succesfull` };
+  }
+
+  async firstChips(id: string) {
+    return { message: `user whith id ${id} first chips succesfull` };
+  }
+
+  async getUserByEmail(email: string) {
+    return { message: `user whith email ${email} get succesfull` };
+  }
+
+  async getUserByNick(nick: string) {
+    return { message: `user whith nick ${nick} get succesfull` };
+  }
+
+  async inactiveUser(id: string) {
+    return { message: `user whith id ${id} inactive succesfull` };
   }
 }
