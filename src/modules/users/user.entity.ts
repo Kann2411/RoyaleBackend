@@ -1,4 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Pay } from '../pay/pay.entity';
+import { Game } from '../games/games.entity';
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -7,7 +16,7 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   image: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: false, length: 50 })
   nick: string;
 
   @Column({ type: 'varchar', nullable: false, unique: true })
@@ -37,12 +46,19 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   country: string;
 
-  @Column({ type: 'integer', nullable: false, default: 0 })
+  @Column({ type: 'bigint', nullable: false, default: 0 })
   chips: number;
 
   @Column({ type: 'varchar', nullable: false })
   password: string;
 
-  @Column({ type: 'varchar', default: false, nullable: true })
+  @Column({ type: 'varchar', default: false })
   firstChips: boolean;
+
+  @OneToMany(() => Pay, (pay) => pay.user)
+  payments: Pay[];
+
+  @ManyToMany(() => Game)
+  @JoinTable()
+  games: Game[];
 }

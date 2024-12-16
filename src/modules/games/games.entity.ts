@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from '../users/user.entity';
 
 @Entity({ name: 'games' })
 export class Game {
@@ -8,5 +9,6 @@ export class Game {
   @Column()
   name: string;
 
-  //relacion muchos a muchos con User
+  @ManyToMany(() => User, (user) => user.games)
+  users: User[];
 }
