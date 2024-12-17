@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -8,6 +9,7 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { Role } from 'src/enums/role.enum';
 
 @Injectable()
 export class userRespository {
@@ -23,6 +25,10 @@ export class userRespository {
       const user = await this.userDBRepository.findOneBy({ id });
       if (!user) {
         throw new NotFoundException('User not found');
+      }
+      if (newData.password) {
+        const hashedPassword = await bcrypt.hash(newData.password, 10);
+        newData.password = hashedPassword;
       }
       const updatedUser = await this.userDBRepository.save({
         ...user,
@@ -45,6 +51,10 @@ export class userRespository {
     chips,
   ): Promise<User> {
     try {
+      const findUser = await this.userDBRepository.findOneBy({ email });
+      if (findUser) {
+        throw new BadRequestException('Email is already in use');
+      }
       const newUser = this.userDBRepository.create({
         nick,
         email,
@@ -85,7 +95,7 @@ export class userRespository {
       const userFindById = await this.userDBRepository.findOneBy({ id });
       if (!userFindById)
         throw new NotFoundException(`User with id ${id} not found`);
-      userFindById.admin = true;
+      userFindById.role = Role.Admin;
       await this.userDBRepository.save(userFindById);
       return { message: `User with id ${id} updated to admin` };
     } catch (error) {
@@ -114,6 +124,7 @@ export class userRespository {
         throw new NotFoundException(`User with id ${id} not found`);
       }
       user.banned = true;
+      await this.userDBRepository.save(user);
       return { message: `User with id ${id} banned` };
     } catch (error) {
       console.log(error);

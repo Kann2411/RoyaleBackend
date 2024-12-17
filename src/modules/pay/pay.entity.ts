@@ -1,9 +1,9 @@
-import { Entity, PrimaryColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 
 @Entity()
 export class Pay {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn('uuid')
   paymentId: string;
 
   @Column({ nullable: true })
