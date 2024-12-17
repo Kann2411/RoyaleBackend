@@ -9,8 +9,8 @@ export class userService {
   getAllUsers() {
     return this.userRespository.getAllUsers();
   }
-  updateUserHandler(id) {
-    return this.userRespository.updateUserHandler(id);
+  updateUserHandler(id, newData) {
+    return this.userRespository.updateUserHandler(id, newData);
   }
 
   postUser(createUserDto: CreateUserDto) {

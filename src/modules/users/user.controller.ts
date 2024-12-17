@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { userService } from './user.service';
 import { CreateUserDto } from 'src/dtos/createUser';
+import { User } from './user.entity';
 
 @Controller('user')
 export class UserController {
@@ -23,8 +24,11 @@ export class UserController {
   }
 
   @Patch('/actualizar-usuario/:id')
-  updateUserHandler(@Param(':id', ParseUUIDPipe) id) {
-    return this.userService.updateUserHandler(id);
+  updateUserHandler(
+    @Param(':id', ParseUUIDPipe) id,
+    @Body() newData: Partial<User>,
+  ) {
+    return this.userService.updateUserHandler(id, newData);
   }
 
   @Post('user-create')

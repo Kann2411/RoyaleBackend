@@ -16,4 +16,6 @@ export class PayService {
       chips,
     );
   }
+
+  async processPayment(payment: any) {}
 }
