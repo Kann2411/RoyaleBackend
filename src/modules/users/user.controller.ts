@@ -6,12 +6,10 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
-  Post,
   Put,
   Query,
 } from '@nestjs/common';
 import { userService } from './user.service';
-import { CreateUserDto } from 'src/dtos/createUser';
 import { User } from './user.entity';
 
 @Controller()
@@ -29,11 +27,6 @@ export class UserController {
     @Body() newData: Partial<User>,
   ) {
     return this.userService.updateUserHandler(id, newData);
-  }
-
-  @Post('user-create')
-  postUser(@Body() createUserDto: CreateUserDto) {
-    return this.userService.postUser(createUserDto);
   }
 
   @Delete('/user-delete/:id')

@@ -150,9 +150,7 @@ export class userRespository {
   async getUserByEmail(email: string) {
     try {
       const userByEmail = await this.userDBRepository.findOneBy({ email });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...rest } = userByEmail;
-      return rest;
+      return userByEmail;
     } catch (error) {
       console.log(error);
       throw new HttpException(
