@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PayModule } from './modules/pay/pay.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './modules/auth/auth.module';
+import { CloudinaryModule } from './modules/clourinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AuthModule } from './modules/auth/auth.module';
     GamesModule,
     PayModule,
     AuthModule,
+    CloudinaryModule,
     JwtModule.register({
       global: true,
       signOptions: { expiresIn: '1h' },
