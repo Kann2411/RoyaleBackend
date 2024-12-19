@@ -21,8 +21,8 @@ export class GamesController {
 
   @Post('favorites')
   addFavoriteGame(
-    @Body(ParseUUIDPipe, ParseUUIDPipe) userId: string,
-    gameId: string,
+    @Body('userId', ParseUUIDPipe) userId: string,
+    @Body('gameId', ParseUUIDPipe) gameId: string,
   ) {
     return this.gamesService.addFavoriteGame(userId, gameId);
   }
