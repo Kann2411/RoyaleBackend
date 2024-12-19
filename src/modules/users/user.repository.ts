@@ -189,4 +189,17 @@ export class userRespository {
       throw new HttpException('Error inactive User', HttpStatus.BAD_REQUEST);
     }
   }
+
+  async save(user: User) {
+    try {
+      const findUser = await this.userDBRepository.findOneBy({
+        email: user.email,
+      });
+      await this.userDBRepository.save(user);
+      return findUser;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Error saving User', HttpStatus.BAD_REQUEST);
+    }
+  }
 }

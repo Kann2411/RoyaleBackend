@@ -1,6 +1,7 @@
-import { Controller, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { PayService } from './pay.service';
 import { CreateOrderMercadoPagoDto } from 'src/dtos/OrderMercadoPago';
+import { PayDto } from 'src/dtos/payDto';
 
 @Controller()
 export class PayController {
@@ -11,6 +12,8 @@ export class PayController {
     return this.payService.createOrderMercadoPago(createorderDto);
   }
 
-  @Post('mepago/webhook')
-  async receiveWebhook(@Query('payment') payment: any, @Res() res: Response) {}
+  @Post('newpay')
+  async receiveWebhook(@Body() pay: PayDto) {
+    return this.payService.createPay(pay);
+  }
 }
