@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Query } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { PayDto } from 'src/dtos/payDto';
 import { MercadoService } from './mercado.service';
 
@@ -11,8 +11,8 @@ export class MercadoController {
     return this.mercadoService.createOrder(orderDto);
   }
 
-  @Post('/mepago/webhook')
-  receiveWebhook(@Query() body: any) {
-    return this.mercadoService.receiveWebhook(body);
-  }
+  // @Post('/mepago/webhook')
+  // receiveWebhook(@Query() body: any) {
+  //   return this.mercadoService.receiveWebhook(body);
+  // }
 }

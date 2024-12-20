@@ -1,115 +1,82 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PayDto } from 'src/dtos/payDto';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Pay } from '../pay/pay.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { userRespository } from '../users/user.repository';
 import { PayRepository } from '../pay/pay.repository';
-import { MercadoPagoConfig, Payment } from 'mercadopago';
+import { MercadoPagoConfig, Preference } from 'mercadopago';
+import { v4 as uuidv4 } from 'uuid';
+import { User } from '../users/user.entity';
+
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MP_ACCESS_TOKEN,
+});
 
 @Injectable()
 export class MercadoService {
-  private client: MercadoPagoConfig;
-  private payment: Payment;
-
   constructor(
     private readonly userRepository: userRespository,
     private readonly payRepository: PayRepository,
+    @InjectDataSource() private readonly dataSource: DataSource,
     @InjectRepository(Pay) private readonly payDBRepository: Repository<Pay>,
-  ) {
-    // Step 2: Initialize the client object
-    this.client = new MercadoPagoConfig({
-      accessToken: process.env.MP_ACCESS_TOKEN,
-      options: { timeout: 5000 },
-    });
+  ) {}
 
-    // Step 3: Initialize the API object
-    this.payment = new Payment(this.client);
-  }
-
-  async createOrder(orderDto: PayDto): Promise<string> {
-    const { paymentPlataform, price, chips, userId, date } = orderDto;
-
-    const body = {
-      transaction_amount: parseFloat(price),
-      description: `${chips} chips`,
-      payment_method_id: 'credit_card', // Ajusta según el método de pago real
-      payer: {
-        email: '<EMAIL>', // Reemplaza con el email del usuario
-      },
-      metadata: {
-        userId,
-        date,
-        paymentPlataform,
-        chips,
-      },
-    };
-
-    const requestOptions = {
-      idempotencyKey: `order-${userId}-${Date.now()}`,
-    };
-
-    try {
-      // Aquí estamos usando el método 'create' para generar el pago.
-      const paymentResponse = await this.payment.create({
-        body,
-        requestOptions,
+  async createOrder(orderDto) {
+    const { userId, chips, paymentPlataform, price } = orderDto;
+    return await this.dataSource.manager.transaction(async (manager) => {
+      const uuid = uuidv4();
+      const pagoB = this.payDBRepository.create({
+        paymentId: String(uuid),
+        paymentPlataform: paymentPlataform,
+        price: price,
+        chips: chips,
+        user: userId,
+        date: new Date().toISOString(),
+      });
+      await this.payDBRepository.save(pagoB);
+      let pago = await this.payDBRepository.findOne({
+        where: { paymentId: pagoB.paymentId },
       });
 
-      // Aquí accedemos directamente a la respuesta del pago, que contiene el campo 'init_point'.
-      return paymentResponse.init_point; // Regresa el URL de pago
-    } catch (error) {
-      console.error('Error creating order:', error);
-      throw new BadRequestException('Error creating order');
-    }
-  }
-
-  async receiveWebhook(paymentData: any): Promise<any> {
-    if (paymentData.type !== 'payment') {
-      throw new BadRequestException('Invalid payment type');
-    }
-
-    try {
-      const paymentId = paymentData['data.id'];
-      const paymentDetails = await this.payment.get(paymentId);
-
-      // Acceder a la respuesta correctamente
-      const pay = {
-        userId: paymentDetails.response.metadata.userId, // Usa 'response'
-        chips: paymentDetails.response.metadata.chips,
-        paymentPlataform: paymentDetails.response.metadata.paymentPlataform,
-        date: paymentDetails.response.metadata.date,
-        paymentId: paymentDetails.response.id,
+      const body = {
+        items: [
+          {
+            id: pago.paymentId,
+            title: 'Chips',
+            quantity: 1,
+            unit_price: Number(pago.price),
+            currency_id: 'ARS',
+          },
+        ],
+        back_urls: {
+          success: 'https://royalgames.me',
+          pending: 'https://royalgames.me',
+          failure: 'https://royalgames.me',
+        },
+        auto_return: 'approved',
       };
+      try {
+        const preference = await new Preference(client).create({ body });
+        const user = await this.userRepository.getUserById(userId);
 
-      const existingPay = await this.payDBRepository.findOne({
-        where: { paymentId: pay.paymentId },
-      });
-
-      if (existingPay) {
-        return { message: 'Payment already exists' };
+        if (!user) {
+          throw new BadRequestException('User not found');
+        }
+        pago = {
+          ...pago,
+          paymentId: preference.id,
+          user: userId,
+          chips: chips,
+          paymentPlataform: paymentPlataform,
+          price: price,
+          date: new Date().toISOString(),
+        };
+        await this.payDBRepository.save(pago);
+        await manager.save(User, user);
+      } catch (error) {
+        console.log(error);
+        throw new BadRequestException('Error creating order');
       }
-
-      const chipsAdded = await this.userRepository.addChips(
-        pay.userId,
-        Number(pay.chips),
-      );
-      if (!chipsAdded) {
-        throw new BadRequestException('Error adding chips');
-      }
-
-      const paymentRecorded = await this.payRepository.createPay(pay);
-      if (!paymentRecorded) {
-        await this.userRepository.addChips(pay.userId, -Number(pay.chips));
-        throw new BadRequestException(
-          'Error al registrar el pago, operación revertida.',
-        );
-      }
-
-      return { message: 'Payment recorded successfully' };
-    } catch (error) {
-      console.error('Error receiving webhook:', error);
-      throw new BadRequestException('Error receiving webhook');
-    }
+    });
   }
 }
