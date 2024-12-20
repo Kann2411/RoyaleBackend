@@ -10,6 +10,7 @@ import { PayModule } from './modules/pay/pay.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './modules/auth/auth.module';
 import { CloudinaryModule } from './modules/clourinary/cloudinary.module';
+import { MercadoModule } from './modules/mercadopago/mercado.module';
 
 @Module({
   imports: [
@@ -22,10 +23,11 @@ import { CloudinaryModule } from './modules/clourinary/cloudinary.module';
       useFactory: (configService: ConfigService) =>
         configService.get('typeorm'),
     }),
+    AuthModule,
     UsersModule,
     GamesModule,
     PayModule,
-    AuthModule,
+    MercadoModule,
     CloudinaryModule,
     JwtModule.register({
       global: true,

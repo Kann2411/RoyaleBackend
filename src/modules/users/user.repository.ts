@@ -202,4 +202,49 @@ export class userRespository {
       throw new HttpException('Error saving User', HttpStatus.BAD_REQUEST);
     }
   }
+
+  async removeChips(id: string, chips: number) {
+    try {
+      const user = await this.userDBRepository.findOneBy({ id });
+      if (!user) {
+        throw new NotFoundException(`User with id ${id} not found`);
+      }
+      const chipsToRemove = Number(chips);
+      if (isNaN(chipsToRemove)) {
+        throw new BadRequestException('Chips must be a number');
+      }
+      const updateChips = user.chips - chipsToRemove;
+      if (updateChips < 0) {
+        throw new BadRequestException('Not enough chips');
+      }
+      user.chips = updateChips;
+      await this.userDBRepository.save(user);
+      const updateUser = await this.userDBRepository.findOneBy({ id });
+      return { message: `User with id ${id} updated`, updateUser };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Error removing chips', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async addChips(id: string, newChips: number) {
+    try {
+      const user = await this.userDBRepository.findOneBy({ id });
+      if (!user) {
+        throw new NotFoundException(`User with id ${id} not found`);
+      }
+      const chipsToAdd = Number(newChips);
+      if (isNaN(chipsToAdd)) {
+        throw new BadRequestException('Chips must be a number');
+      }
+      const updateChips = Number(user.chips) + chipsToAdd;
+      user.chips = updateChips;
+      await this.userDBRepository.save(user);
+      const updateUser = await this.userDBRepository.findOneBy({ id });
+      return { message: `User updated`, updateUser };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Error adding chips', HttpStatus.BAD_REQUEST);
+    }
+  }
 }

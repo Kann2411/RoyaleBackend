@@ -43,4 +43,12 @@ export class userService {
   inactiveUser(id: string) {
     return this.userRespository.inactiveUser(id);
   }
+
+  removeChips(id: string, chips: number) {
+    return this.userRespository.removeChips(id, chips);
+  }
+
+  addChips(id: string, chips: number) {
+    return this.userRespository.addChips(id, chips);
+  }
 }

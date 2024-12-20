@@ -68,4 +68,21 @@ export class UserController {
   inactiveUser(@Body('id', ParseUUIDPipe) id: string) {
     return this.userService.inactiveUser(id);
   }
+
+  // ? Rutas para agregar y quitar chips
+  @Patch('remove/chips')
+  removeChips(
+    @Body('id', ParseUUIDPipe) id: string,
+    @Body('removeChip') chips: number,
+  ) {
+    return this.userService.removeChips(id, chips);
+  }
+
+  @Patch('add/chips')
+  addChips(
+    @Body('id', ParseUUIDPipe) id: string,
+    @Body('newChips') newChips: number,
+  ) {
+    return this.userService.addChips(id, newChips);
+  }
 }

@@ -18,7 +18,7 @@ export class PayRepository {
     return await this.payRepository.findOne({ where: criteria });
   }
 
-  async createPay(payData: PayDto): Promise<Pay> {
+  async createPay(payData: Partial<PayDto>): Promise<Pay> {
     const pay = this.payRepository.create(payData);
     return await this.payRepository.save(pay);
   }
