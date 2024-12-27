@@ -46,4 +46,5 @@ export default async (username, email, preSubject, message) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .then((result) => '¡Envío exitoso!')
     .catch((error) => error.message);
+  return true;
 };
